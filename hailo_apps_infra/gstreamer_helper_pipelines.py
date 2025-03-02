@@ -255,11 +255,12 @@ def DISPLAY_PIPELINE(video_sink='autovideosink', sync='true', show_fps='false', 
     """
     # Construct the display pipeline string
     display_pipeline = (
-        f'{OVERLAY_PIPELINE(name=f"{name}_overlay")} ! '
+        # f'{OVERLAY_PIPELINE(name=f"{name}_overlay")} ! '
         f'{QUEUE(name=f"{name}_videoconvert_q")} ! '
         f'videoconvert name={name}_videoconvert n-threads=2 qos=false ! '
         f'{QUEUE(name=f"{name}_q")} ! '
-        f'fpsdisplaysink name={name} video-sink={video_sink} sync={sync} text-overlay={show_fps} signal-fps-measurements=true '
+        f'fakevideosink sync={sync} '
+        # f'fpsdisplaysink name={name} video-sink={video_sink} sync={sync} text-overlay={show_fps} signal-fps-measurements=true '
     )
 
     return display_pipeline
@@ -302,6 +303,7 @@ def USER_CALLBACK_PIPELINE(name='identity_callback'):
     """
     # Construct the user callback pipeline string
     user_callback_pipeline = (
+        f'{OVERLAY_PIPELINE(name=f"{name}_overlay")} ! '
         f'{QUEUE(name=f"{name}_q")} ! '
         f'identity name={name} '
     )
