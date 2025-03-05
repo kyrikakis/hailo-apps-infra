@@ -23,16 +23,21 @@ H8_HEFS=(
   "https://hailo-model-zoo.s3.eu-west-2.amazonaws.com/ModelZoo/Compiled/v2.13.0/hailo8/yolov8m_pose.hef"
   "https://hailo-model-zoo.s3.eu-west-2.amazonaws.com/ModelZoo/Compiled/v2.13.0/hailo8/yolov5m_seg.hef"
   "https://hailo-model-zoo.s3.eu-west-2.amazonaws.com/ModelZoo/Compiled/v2.13.0/hailo8/yolov8m.hef"
+  "https://hailo-tappas.s3.eu-west-2.amazonaws.com/v3.31/general/hefs/arcface_mobilefacenet_v1.hef"
+  "https://hailo-tappas.s3.eu-west-2.amazonaws.com/v3.31/general/hefs/scrfd_10g.hef"
 )
 
 H8L_HEFS=(
   "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8l_rpi/yolov8s_h8l.hef"
   "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8l_rpi/yolov5n_seg_h8l_mz.hef"
   "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/hefs/h8l_rpi/yolov8s_pose_h8l.hef"
+  "https://hailo-tappas.s3.eu-west-2.amazonaws.com/general/hefs/arcface_mobilefacenet_v1.hef"
+  "https://hailo-tappas.s3.eu-west-2.amazonaws.com/general/hefs/scrfd_10g.hef"
 )
 
-VIDEOS=(
+FILES=(
   "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/example.mp4"
+  "https://hailo-tappas.s3.eu-west-2.amazonaws.com/v3.31/general/media/face_recognition/face_recognition_local_gallery.json"
 )
 
 # If --all flag is provided, download everything in parallel
@@ -56,7 +61,7 @@ else
 fi
 
 # Download additional videos
-for url in "${VIDEOS[@]}"; do
+for url in "${FILES[@]}"; do
   download_model "$url" &
 done
 

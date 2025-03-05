@@ -58,3 +58,16 @@ shared_library('yolov5seg_postprocess',
     install: true,
     install_dir: join_paths(meson.project_source_root(), 'resources'),
 )
+
+################################################
+# VMS FACE ALIGN SOURCE
+################################################
+face_align_src = 'face_align.cpp'
+
+shared_library('vms_face_align',
+  face_align_src,
+  dependencies : postprocess_dep,
+  gnu_symbol_visibility : 'default',
+  install: true,
+  install_dir: join_paths(meson.project_source_root(), 'resources'),
+)
