@@ -1,27 +1,13 @@
 import gi
 gi.require_version('Gst', '1.0')
-from gi.repository import Gst, GLib
 import os
-import argparse
-import multiprocessing
-import numpy as np
 import setproctitle
-import cv2
-import time
-import hailo
 from hailo_apps_infra.hailo_rpi_common import (
     get_default_parser,
     detect_hailo_arch,
 )
 from hailo_apps_infra.gstreamer_helper_pipelines import(
-    QUEUE,
     SOURCE_PIPELINE,
-    INFERENCE_PIPELINE,
-    INFERENCE_PIPELINE_WRAPPER,
-    TRACKER_PIPELINE,
-    OVERLAY_PIPELINE,
-    USER_CALLBACK_PIPELINE,
-    DISPLAY_PIPELINE,
 )
 from hailo_apps_infra.gstreamer_app import (
     GStreamerApp,
@@ -189,7 +175,7 @@ class GStreamerFaceDetectionApp(GStreamerApp):
     
     def user_callback_pipeline(self):
         user_callback_pipeline = (
-            f'{QUEUE(name=f"identity_callback_q")} ! '
+            f'queue name=dentity_callback_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 ! '
             f'identity name=identity_callback '
         )
         return user_callback_pipeline
