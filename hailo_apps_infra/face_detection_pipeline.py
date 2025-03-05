@@ -102,25 +102,18 @@ class GStreamerFaceDetectionApp(GStreamerApp):
 
     def get_pipeline_string(self):
         source_pipeline = SOURCE_PIPELINE(self.video_source, self.video_width, self.video_height)
-        pre_detector_pipeline = self.pre_detector_pipeline()
-        object_detection_pipeline = self.object_detection_pipeline()
-        face_detection_pipeline = self.face_detection_pipeline()
-        face_tracker_pipeline = self.face_tracker_pipeline()
-        face_recognition_pipeline = self.face_recognition_pipeline()
-        embeddings_gallery_pipeline = self.embeddings_gallery_pipeline()
-        user_callback_pipeline = USER_CALLBACK_PIPELINE()
-        display_pipeline = self.sink_pipeline()
 
         pipeline_string = (
             f'{source_pipeline} ! '
-            f'{pre_detector_pipeline}'
-            f'{object_detection_pipeline}'
-            f'{face_detection_pipeline}'
-            f'{face_tracker_pipeline}'
-            f'{face_recognition_pipeline}'
-            f'{embeddings_gallery_pipeline}'
-            f'{user_callback_pipeline} ! '
-            f'{display_pipeline}'
+            f'{self.pre_detector_pipeline()}'
+            f'{self.object_detection_pipeline()}'
+            f'{self.face_detection_pipeline()}'
+            f'{self.face_tracker_pipeline()}'
+            f'{self.face_recognition_pipeline()}'
+            f'{self.embeddings_gallery_pipeline()}'
+            f'{self.overlay_pipeline()}'
+            f'{self.user_callback_pipeline()} ! '
+            f'{self.display_pipeline()}'
         )
         print(pipeline_string)
         return pipeline_string
@@ -187,14 +180,28 @@ class GStreamerFaceDetectionApp(GStreamerApp):
         )
         return gallery_pipeline
     
-    def sink_pipeline(self):
-        sink_pipeline = (
-            f'{QUEUE(name=f"sink_videoconvert_q")} ! '
+    def overlay_pipeline(self):
+        user_callback_pipeline = (
+            f'queue name=hailo_pre_draw2 leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 ! '
+            f'hailooverlay name=hailo_overlay qos=false show-confidence=false local-gallery=false line-thickness=5 font-thickness=2 landmark-point-radius=8 ! '
+        )
+        return user_callback_pipeline
+    
+    def user_callback_pipeline(self):
+        user_callback_pipeline = (
+            f'{QUEUE(name=f"identity_callback_q")} ! '
+            f'identity name=identity_callback '
+        )
+        return user_callback_pipeline
+    
+    def display_pipeline(self):
+        display_pipeline = (
+            f'queue name=hailo_post_draw leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 ! '
             f'videoconvert name=sink_videoconvert n-threads=2 qos=false ! '
-            f'{QUEUE(name=f"sink_q")} ! '
+            f'queue name=hailo_display_q_0 leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 ! '
             f'fakevideosink sync=false '
         )
-        return sink_pipeline
+        return display_pipeline
     
 if __name__ == "__main__":
     # Create an instance of the user app callback class
