@@ -1,0 +1,39 @@
+filesrc location=/workspaces/tappas/apps/h8/gstreamer/general/face_recognition/resources/face_recognition.mp4 name=src_0 !
+decodebin !
+queue name=hailo_pre_convert_0 leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+videoconvert n-threads=2 qos=false !
+queue name=pre_detector_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+tee name=t hailomuxer name=hmux t. !
+queue name=detector_bypass_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hmux. t. !
+videoscale name=face_videoscale method=0 n-threads=2 add-borders=false qos=false !
+video/x-raw, pixel-aspect-ratio=1/1 !
+queue name=pre_face_detector_infer_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailonet hef-path=/workspaces/tappas/apps/h8/gstreamer/general/face_recognition/resources/scrfd_10g.hef scheduling-algorithm=1 vdevice-group-id=1 !
+queue name=detector_post_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailofilter so-path=/workspaces/tappas/apps/h8/gstreamer/libs/post_processes//libscrfd_post.so name=face_detection_hailofilter qos=false config-path=/workspaces/tappas/apps/h8/gstreamer/general/face_recognition/resources/configs/scrfd.json function_name=scrfd_10g !
+queue leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hmux. hmux. !
+queue name=pre_tracker_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailotracker name=hailo_face_tracker class-id=-1 kalman-dist-thr=0.7 iou-thr=0.8 init-iou-thr=0.9 keep-new-frames=2 keep-tracked-frames=6 keep-lost-frames=8 keep-past-metadata=true qos=false !
+queue name=hailo_post_tracker_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailocropper so-path=/workspaces/tappas/apps/h8/gstreamer/libs/post_processes//cropping_algorithms/libvms_croppers.so function-name=face_recognition internal-offset=true name=cropper2 hailoaggregator name=agg2 cropper2. !
+queue name=bypess2_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+agg2. cropper2. !
+queue name=pre_face_align_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailofilter so-path=/workspaces/tappas/apps/h8/gstreamer/libs/apps/vms//libvms_face_align.so name=face_align_hailofilter use-gst-buffer=true qos=false !
+queue name=detector_pos_face_align_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailonet hef-path=/workspaces/tappas/apps/h8/gstreamer/general/face_recognition/resources/arcface_mobilefacenet_v1.hef scheduling-algorithm=1 vdevice-group-id=1 !
+queue name=recognition_post_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailofilter function-name=arcface_rgb so-path=/workspaces/tappas/apps/h8/gstreamer/libs/post_processes//libface_recognition_post.so name=face_recognition_hailofilter qos=false !
+queue name=recognition_pre_agg_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+agg2. agg2. !
+queue name=hailo_pre_gallery_q leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailogallery gallery-file-path=/workspaces/tappas/apps/h8/gstreamer/general/face_recognition/resources/gallery/face_recognition_local_gallery_rgba.json load-local-gallery=true similarity-thr=.4 gallery-queue-size=20 class-id=-1 !
+queue name=hailo_pre_draw2 leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+hailooverlay name=hailo_overlay qos=false show-confidence=false local-gallery=true line-thickness=5 font-thickness=2 landmark-point-radius=8 !
+queue name=hailo_post_draw leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+videoconvert n-threads=4 qos=false name=display_videoconvert qos=false !
+queue name=hailo_display_q_0 leaky=no max-size-buffers=30 max-size-bytes=0 max-size-time=0 !
+jpegenc !
+tcpserversink name=hailo_display host=192.168.1.172 port=3000
