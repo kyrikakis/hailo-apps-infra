@@ -25,4 +25,3 @@ dist/
 .cache/
 coverage/
 core
-resources/face_recognition_local_gallery.json
