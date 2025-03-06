@@ -96,7 +96,7 @@ class GStreamerFaceDetectionApp(GStreamerApp):
             f'{self.face_detection_pipeline()}'
             f'{self.face_tracker_pipeline()}'
             f'{self.face_recognition_pipeline()}'
-            f'{self.embeddings_gallery_pipeline()}'
+            # f'{self.embeddings_gallery_pipeline()}'
             f'{self.overlay_pipeline()}'
             f'{self.user_callback_pipeline()} ! '
             f'{self.display_pipeline()}'
