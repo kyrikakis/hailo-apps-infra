@@ -275,7 +275,7 @@ def picamera_thread(pipeline, video_width, video_height, video_format, picamera_
             # Default configuration
             main = {'size': (1280, 720), 'format': 'RGB888'}
             lores = {'size': (video_width, video_height), 'format': 'RGB888'}
-            controls = {'FrameRate': 15}
+            controls = {'FrameRate': 30}
             config = picam2.create_preview_configuration(main=main, lores=lores, controls=controls)
         else:
             config = picamera_config

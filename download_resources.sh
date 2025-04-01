@@ -47,7 +47,7 @@ H8L_HEFS=(
 )
 
 
-FILES=(
+VIDEOS=(
   "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/example.mp4"
   "https://hailo-csdata.s3.eu-west-2.amazonaws.com/resources/video/example_640.mp4"
 )
@@ -73,7 +73,7 @@ else
 fi
 
 # Download additional videos
-for url in "${FILES[@]}"; do
+for url in "${VIDEOS[@]}"; do
   download_model "$url" &
 done
 
